@@ -22,7 +22,7 @@ public class TestPet {
     @Severity(SeverityLevel.CRITICAL)
     @Owner("sergey zhitlov")
     public void testDeleteNonexistentPet() {
-        Response response = step("Отправить DELETE запрос на удаление несуществующего models.Pet", () ->
+        Response response = step("Отправить DELETE запрос на удаление несуществующего Pet", () ->
                 given()
                     .contentType(ContentType.JSON)
                     .header("Accept", "application/json")
@@ -73,5 +73,30 @@ public class TestPet {
         );
 
 
+    }
+
+    @Test
+    @Feature("Pet")
+    @Severity(SeverityLevel.CRITICAL)
+    @Owner("sergey zhitlov")
+    public void testGettingInformationNonexistentPet() {
+        Response response = step("Отправить GET запрос на ролучение информации о несуществующем питомце", () ->
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Accept", "application/json")
+                        .when()
+                        .get(BASE_URL + "/pet/9999"));
+
+        String responseBody = response.getBody().asString();
+
+        step("Проверить, что статус-код ответа == 404", () ->
+                assertEquals(404, response.getStatusCode(),
+                        "Код ответа не совпал с ожидаемым. Ответ: " + responseBody)
+        );
+
+        step("Проверить, что текст ответа 'Pet not found'", () ->
+                assertEquals("Pet not found", responseBody,
+                        "Текст ошибки не совпал с ожидаемым. Получен: " + responseBody)
+        );
     }
 }
